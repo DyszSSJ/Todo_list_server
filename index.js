@@ -6,6 +6,15 @@ import { resolvers } from "./gql/resolvers.js";
 import express from "express";
 import cors from "cors";
 
+
+
+const corsUrl = [
+  {
+    origin: "http://localhost:3000",
+    credentials: true,
+  } 
+]
+
 const connectToMongoDB = async () => {
   try {
     await mongoose.connect(process.env.DB, {
@@ -31,11 +40,11 @@ async function server() {
   const app = express();
 
   // Habilitar solicitudes CORS de cualquier origen
-  app.use(cors(
-    {
-      origin: "*",
-    }
-  ));
+  app.use(
+    cors({
+      origin: corsUrl
+    })
+  );
 
   // Obtener el middleware de GraphQL
   const graphqlMiddleware = serverApollo.getMiddleware({ path: "/" });
