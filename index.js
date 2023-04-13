@@ -31,7 +31,11 @@ async function server() {
   const app = express();
 
   // Habilitar solicitudes CORS de cualquier origen
-  app.use(cors());
+  app.use(cors(
+    {
+      origin: "*",
+    }
+  ));
 
   // Obtener el middleware de GraphQL
   const graphqlMiddleware = serverApollo.getMiddleware({ path: "/" });
