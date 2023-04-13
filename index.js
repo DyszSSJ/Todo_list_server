@@ -4,7 +4,6 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./gql/schemas.js";
 import { resolvers } from "./gql/resolvers.js";
-import cors from "cors";
 
 const connectToMongoDB = async () => {
   try {
@@ -24,14 +23,14 @@ async function server() {
   const serverApollo = new ApolloServer({
     typeDefs,
     resolvers,
+    cors: {
+      origin: "http://localhost:3000/",
+      credentials: true,
+    },
   });
 
   const { url } = await startStandaloneServer(serverApollo, {
-    port: process.env.PORT || 4000,
-    cors: {
-      origin: "http://localhost:3000",
-      credentials: true,
-    },
+    port: process.env.PORT || 4000
   });
 
   console.log(`Servidor corriendo en la url ${url}`);
