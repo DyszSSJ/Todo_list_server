@@ -1,9 +1,10 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import { ApolloServer } from "apollo-server-express";
 import { typeDefs } from "./gql/schemas.js";
 import { resolvers } from "./gql/resolvers.js";
+import express from "express";
+import cors from "cors";
 
 const connectToMongoDB = async () => {
   try {
@@ -25,11 +26,23 @@ async function server() {
     resolvers,
   });
 
-  const { url } = await startStandaloneServer(serverApollo, {
-    port: process.env.PORT || 4000,
-  });
+  await serverApollo.start();
 
-  console.log(`Servidor corriendo en la url ${url}`);
+  const app = express();
+
+  // Habilitar solicitudes CORS de cualquier origen
+  app.use(cors());
+
+  // Obtener el middleware de GraphQL
+  const graphqlMiddleware = serverApollo.getMiddleware({ path: "/" });
+
+  // Agregar el middleware de GraphQL a express
+  app.use(graphqlMiddleware);
+
+  const port = process.env.PORT || 4000;
+  app.listen(port, () => {
+    console.log(`Servidor corriendo en el puerto ${port}`);
+  });
 }
 
 server();
