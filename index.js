@@ -5,6 +5,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./gql/schemas.js";
 import { resolvers } from "./gql/resolvers.js";
 
+
 const connectToMongoDB = async () => {
   try {
     await mongoose.connect(process.env.DB, {
@@ -23,6 +24,8 @@ async function server() {
   const serverApollo = new ApolloServer({
     typeDefs,
     resolvers,
+    cors : false
+     
   });
 
   const { url } = await startStandaloneServer(serverApollo, {
