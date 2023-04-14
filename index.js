@@ -1,32 +1,35 @@
+import "dotenv/config";
+import mongoose from "mongoose";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./gql/schemas.js";
 import { resolvers } from "./gql/resolvers.js";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-dotenv.config({ path: ".env" });
 
-mongoose.set("strictQuery", true);
-const db = process.env.DB;
-
-mongoose.connect(db, { useNewUrlParser: true }, function (err) {
-  if (err) {
-    console.error("Error al conectar con la base de datos:", err);
-    return;
+const connectToMongoDB = async () => {
+  try {
+    await mongoose.connect(process.env.DB, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Conexión a MongoDB exitosa");
+  } catch (err) {
+    console.error("Error al conectar a MongoDB:", err);
   }
-  console.log("Conexión exitosa");
-  server();
-});
+};
 
-async function server(){
-    const server = new ApolloServer({
-        typeDefs,
-        resolvers,
-    });
+connectToMongoDB();
 
-    const { url } =  await startStandaloneServer(server,{
-        port: process.env.PORT || 4000,
-    });
+async function server() {
+  const serverApollo = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
 
-    console.log(`Server ready at ${url}`);
+  const { url } = await startStandaloneServer(serverApollo, {
+    port: process.env.PORT || 4000,
+  });
+
+  console.log(`Servidor corriendo en la url ${url}`);
 }
+
+server();
